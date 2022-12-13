@@ -1,0 +1,146 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+   <parent>
+        <artifactId>jboss-parent</artifactId>
+        <groupId>org.jboss</groupId>
+        <version>39</version>
+    </parent>
+  <groupId>org.wildfly.plugin</groupId>
+  <artifactId>experimental-annotation-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>example-annotation-plugin Maven Mojo</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.io.smallrye.jandex>3.0.3</version.io.smallrye.jandex>
+    <version.org.apache.maven.core>3.3.9</version.org.apache.maven.core>
+    <version.org.apache.maven.plugin-tools>3.7.0</version.org.apache.maven.plugin-tools>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.smallrye</groupId>
+      <artifactId>jandex</artifactId>
+      <version>${version.io.smallrye.jandex}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${version.org.apache.maven.core}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${version.org.apache.maven.core}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${version.org.apache.maven.core}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model-builder</artifactId>
+      <version>${version.org.apache.maven.core}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>${version.org.apache.maven.plugin-tools}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>1.10.19</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${version.org.apache.maven.plugin-tools}</version>
+          <configuration>
+            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+          </configuration>
+          <executions>
+            <execution>
+              <id>mojo-descriptor</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>descriptor</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>help-goal</id>
+              <goals>
+                <goal>helpmojo</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>run-its</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+              <execution>
+                <id>integration-tests</id>
+                <goals>
+                  <goal>install</goal>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                  <debug>true</debug>
+                  <goals>
+                    <goal>clean</goal>
+                    <goal>generate-resources</goal>
+                  </goals>
+                  <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+                  <mavenHome>${it.maven.home}</mavenHome>
+                  <pomIncludes>
+                    <pomInclude>*/pom.xml</pomInclude>
+                  </pomIncludes>
+                  <projectsDirectory>src/it</projectsDirectory>
+                  <postBuildHookScript>verify</postBuildHookScript>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
